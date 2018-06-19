@@ -18,20 +18,9 @@ $ git clone https://github.com/casacore/casacore
 
 The code contains modules that enable multi-threaded access to mesurement sets.
 
-To enable parallel IO, compile using: 
-
-In the casacore source folder run:
+To enable parallel IO, compile using (relavant sections of cmake args): 
 ```
-mkdir build
-cd build
-cmake ..
-make 
-make install
+$ cmake -DCMAKE_EXE_LINKER_FLAGS="-lrt" -DCMAKE_CXX_FLAGS="-qopenmp -DPARIO" -DCMAKE_EXE_LINKER_FLAGS="-lpthread -lrt -lboost_regex -lboost_thread -qopenmp -lboost_filesystem -lboost_system -DPARIO"-DUSE_STACKTRACE=ON -DUSE_THREADS=ON *<your_cmake_switches>* 
 ```
 
-there are various flags available to cmake to enable and disable options:
-```
-$ cmake -DUSE_FFTW3=ON -DDATA_DIR=/usr/share/casacore/data -DUSE_OPENMP=ON \
-    -DUSE_HDF5=ON -DBUILD_PYTHON=ON -DUSE_THREADS=ON
-```
 
