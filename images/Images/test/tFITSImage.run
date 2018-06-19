@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Make output independent of date and version.
+$casa_checktool ./tFITSImage | fold -w 80 | sed 's/DATE    =\(.*written\)   /DATE =>>>\1<<</' | sed "s/ORIGIN  = 'casacore-\(.*\)'/ORIGIN  = 'casacore->>>\1<<<'/"

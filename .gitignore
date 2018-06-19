@@ -1,0 +1,11 @@
+doc/html/
+build/
+*shiv*
+*~
+*table.lock
+*CMakeCache.txt
+*CMakeFiles
+.project
+.cproject
+.settings
+
