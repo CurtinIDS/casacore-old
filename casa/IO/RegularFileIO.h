@@ -34,6 +34,43 @@
 #include <casacore/casa/OS/RegularFile.h>
 
 
+
+//Parallel IO
+#if defined(PARIO) || defined(PARIO_DEBUG)
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/string.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/thread/thread.hpp>
+//#include <boost/regex.hpp> 
+#include <boost/unordered_map.hpp>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>        
+#include <omp.h>
+#include <fstream>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+namespace ipc=boost::interprocess;
+typedef ipc::allocator<char, ipc::managed_shared_memory::segment_manager>
+   charAllocator;
+typedef ipc::basic_string<char, std::char_traits<char>, charAllocator>
+   shmString;
+typedef shmString shmKey;
+typedef int shmValue;
+typedef std::pair<shmKey,shmValue> shmPair;
+typedef ipc::allocator<shmPair,ipc::managed_shared_memory::segment_manager> shmPairAllocator;
+
+typedef boost::unordered_map<shmKey, shmValue,
+           boost::hash<shmKey>, std::equal_to<shmKey>,
+           shmPairAllocator> shmHashMap;
+
+#endif
+
 namespace casacore { //# NAMESPACE CASACORE - BEGIN
 
 // <summary> 
@@ -117,10 +154,23 @@ private:
 
     // Assignment, should not be used.
     RegularFileIO& operator= (const RegularFileIO& that);
+
+#if defined(PARIO) || defined(PARIO_DEBUG)
+        static int omp_file_dump(std::string filename,char *buff,int threads);
+        static void insertHash(std::string str,int myval,charAllocator chralloc,shmHashMap *map);
+        static void threadedRead(std::string filename,char *buff,int threads,int fd);
+
+        static int shmInsert(std::string db,std::string table,std::string filePath,int value);
+
+        static void removeShm(std::string inp);
+        static std::string replace(std::string inp);
+        static long get_file_size(std::string filename);
+#endif
+
+
+
 };
-
-
-
 } //# NAMESPACE CASACORE - END
 
 #endif
+
